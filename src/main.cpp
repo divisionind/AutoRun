@@ -13,44 +13,12 @@
 #include "systemtray.h"
 
 /*
- * *NOT IT* The idea here is to use keybd_event() instead of SendInput() to avoid the problem of
- * some (games in particular) applications not responding well to SendInput() while
- * also playing nice with the previous code written for SendInput
- * https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-keybd_event
- *
- * HAS THE SAME ISSUE
- * The games might be monitoring the status of LLKHF_INJECTED and ignoring it.
- * Modify this flag in the llkeyboardproc if it is our custom release keys?
- *
- * As written in "Practical Video Game Bots: Automating Game Processes..." by Ilya Shpigor p.g. 90:
- *  "All keyboard events, which are produced by the SendInput and keybd_event WinAPI functions, have
- *  the LLKHF_INJECTED flag in the KBDLLHOOKSTRUCT structure. One the other hand, keyboard events,
- *  which are produced by a keyboard driver, do not have this flag. This flag is set on the Windows
- *  kernel level, and it is impossible to disable the flag on the WinAPI level."
- *
- * We have some possibilities in that we could create a virtual keyboard driver for our application
- * or patch the windows kernel. However, these are pretty extreme for our purposes and would likely
- * not play well with some anticheats. If we really wanted to remove this flag we could attempt to
- * do so in llkeyboardproc as noted earlier. However, this may not fix the issue either as:
- *
- * *NOT IT* SendInput and keybd_event are susceptible to User Interface Privilege Isolation (UIPI). An
+ * SendInput and keybd_event are susceptible to User Interface Privilege Isolation (UIPI). An
  * application running at a higher integrity level than an application calling SendInput will
  * not receive this input.
- *
- * Also I have seen reports that using scancode instead of the virtual keycode could fix the
- * keyup not registering problem. See the keybd_event microsoft docs for more.
- * https://www.win.tue.nl/~aeb/linux/kbd/scancodes-1.html
- * for a list of scancodes (1.4 ordinary scancodes) section
- * *THIS WAS IT*
+ * Maybe run AutoRun with administrator permissions if it doesn't work with some apps?
  */
 
-/*
- * TODO Known Issues:
- * - games like Minecraft that rely more on the actual key up and key down messages rather than key repeats
- *   still hold the keys even when repeating is done (must manually press the held key and release to stop holding)
- *   - note: I now think that the game is just not listening to our key events and the only reason
- *     it is holding the keys is because we consumed the key up event
- */
 #ifdef AUTORUN_DEBUG
 // can use these as well: __FILE__, __LINE__ and __func__
 #define log(x, ...) printf(x, __VA_ARGS__)
@@ -144,7 +112,7 @@ void disable_hold_task() {
         delete[] inputsBuffer;
         holdTask = NULL;
 
-        // must zero memory here because we do not track key events whilst this task is enabled TODO may not be necessary
+        // zero memory here because we do not track key events whilst this task is enabled (not entirely necessary as we run this synchronously with llkeyboardproc)
         memset(KEY_STATES, 0, KEY_STATE_BUFFER_SIZE);
         log("toggled off\n");
     }
