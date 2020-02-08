@@ -3,8 +3,8 @@
  * All rights reserved.
  */
 
-#ifndef AUTORUN2_VKARRAY_H
-#define AUTORUN2_VKARRAY_H
+#ifndef AUTORUN_VKARRAY_H
+#define AUTORUN_VKARRAY_H
 
 #include <cstdint>
 
@@ -15,4 +15,4 @@
  */
 uint8_t* prepare_vkarray(int* arraySize);
 
-#endif //AUTORUN2_VKARRAY_H
+#endif //AUTORUN_VKARRAY_H

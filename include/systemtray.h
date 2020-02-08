@@ -3,8 +3,8 @@
  * All rights reserved.
  */
 
-#ifndef AUTORUN2_SYSTEMTRAY_H
-#define AUTORUN2_SYSTEMTRAY_H
+#ifndef AUTORUN_SYSTEMTRAY_H
+#define AUTORUN_SYSTEMTRAY_H
 
 #include <Windows.h>
 
@@ -30,4 +30,4 @@ tray_error_t tray_remove(tray_t*);
 }
 #endif
 
-#endif //AUTORUN2_SYSTEMTRAY_H
+#endif //AUTORUN_SYSTEMTRAY_H
