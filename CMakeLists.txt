@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(AutoRun2)
+project(AutoRun)
 
 set(CMAKE_CXX_STANDARD 14)
 
@@ -11,8 +11,8 @@ set(SRC_LIST src/main.cpp include/vkarray.h src/vkarray.cpp include/resource.h A
 #if cmake is run with the -DRELEASE_BUILD=1 flag, this will evaluate true
 if(RELEASE_BUILD)
     add_compile_options("-MT")
-    add_executable(AutoRun2 WIN32 ${SRC_LIST})
+    add_executable(AutoRun WIN32 ${SRC_LIST})
 else()
     add_definitions(-DAUTORUN_DEBUG)
-    add_executable(AutoRun2 ${SRC_LIST})
+    add_executable(AutoRun ${SRC_LIST})
 endif()
