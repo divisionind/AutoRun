@@ -12,6 +12,8 @@
 
 const char szClassName[] = "GenericTrayCallback";
 
+extern void safe_exit(int code);
+
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     switch (msg) {
         case TRAY_CALLBACK_MSG:
@@ -47,7 +49,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
                                       "at https://github.com/divisionind/AutoRun for more info.", "AutoRun", MB_OK | MB_ICONINFORMATION);
                     break;
                 case ID_TRAY_MENU_EXIT:
-                    ExitProcess(0);
+                    safe_exit(0);
                 default:
                     break;
             }

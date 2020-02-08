@@ -69,6 +69,7 @@
 #define KEY_STATE_BUFFER_SIZE 256
 
 tray_t tray;
+HHOOK keyboardHook;
 uint8_t KEY_STATES[KEY_STATE_BUFFER_SIZE];
 uint8_t* vkarray;
 int vkarray_size;
@@ -212,6 +213,20 @@ int main() {
     return WinMain(GetModuleHandle(NULL), NULL, NULL, NULL);
 }
 
+/**
+ * Exits the application immediately disposing resources
+ */
+extern "C" void safe_exit(int code) {
+    UnhookWindowsHookEx(keyboardHook);
+    if (enabled) {
+        enabled = false;
+        disable_hold_task();
+    }
+    delete[] vkarray;
+    tray_remove(&tray);
+    ExitProcess(code);
+}
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     // the handle should equal NULL here if creating the mutex failed. however, it doesnt so I just check for the error code
     CreateMutexA(0, FALSE, "Global\\AutoRunMutex"); // or could be Local if I wanted multiple users to be running this at a time
@@ -240,7 +255,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     enabled = false;
     vkarray = prepare_vkarray(&vkarray_size);
 
-    HHOOK keyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, NULL, 0);
+    keyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, NULL, 0);
     if (keyboardHook == NULL) {
         P_FATAL_ERROR("Failed to set windows low level keyboard hook.");
     }
@@ -257,12 +272,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
         }
     }
 
-    UnhookWindowsHookEx(keyboardHook);
-    if (enabled) {
-        enabled = false;
-        disable_hold_task();
-    }
-    delete[] vkarray;
-    tray_remove(&tray);
+    safe_exit(0);
     return 0;
 }
