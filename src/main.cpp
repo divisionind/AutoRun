@@ -41,16 +41,8 @@
  * keyup not registering problem. See the keybd_event microsoft docs for more.
  * https://www.win.tue.nl/~aeb/linux/kbd/scancodes-1.html
  * for a list of scancodes (1.4 ordinary scancodes) section
+ * *THIS WAS IT*
  */
-//void _SendInput(UINT numInputs, INPUT* pInputs, int) {
-//    for (UINT i = 0; i < numInputs; i++) {
-//        // still adds the LLKHF_INJECTED flag
-//        keybd_event(pInputs[i].ki.wVk,
-//            0,
-//            pInputs[i].ki.dwFlags & (KEYEVENTF_KEYUP | KEYEVENTF_EXTENDEDKEY), // mask out stuff that we potentially dont want
-//            0);
-//    }
-//}
 
 /*
  * TODO Known Issues:
@@ -110,6 +102,8 @@ void enable_hold_task() {
     for (int i = 0; i < inputsBufferSize; i++) {
         inputsBuffer[i].type = INPUT_KEYBOARD;
         inputsBuffer[i].ki.wVk = inputCodes[i];
+        // resolves a scancode for the input, necessary for most games
+        inputsBuffer[i].ki.wScan = MapVirtualKeyA(inputCodes[i], MAPVK_VK_TO_VSC);
 
         log("0x%02X ", inputCodes[i]);
     }

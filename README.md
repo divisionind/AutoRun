@@ -13,9 +13,7 @@ TODO
 
 ### Other notes / Known issues
 This program is currently in the early stages of development and will likely change a lot
-as time passes. There is also an issue where keys are not able to be released in some
-programs manually. In order for them to be released, they must be pressed again manually
-then released.
+as time passes.
 
 *NOTE: My main reason for writing this was to explore low level inputs on Windows so how
 I do stuff here is not the best or easiest in all cases but instead its in service of 
