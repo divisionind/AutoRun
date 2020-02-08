@@ -213,10 +213,16 @@ int main() {
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
+    // the handle should equal NULL here if creating the mutex failed. however, it doesnt so I just check for the error code
+    CreateMutexA(0, FALSE, "Global\\AutoRunMutex"); // or could be Local if I wanted multiple users to be running this at a time
+    if (GetLastError() == ERROR_ALREADY_EXISTS) {
+        P_FATAL_ERROR("The AutoRun application is already running. See the system "
+                      "tray entry for more options.");
+    }
+
     // register hotkey first (as this will fail if another instance of the program is already running)
     if (RegisterHotKey(NULL, 1, MOD_NOREPEAT | MOD_ALT | MOD_WIN, VK_PAUSE) == 0) {
-        P_FATAL_ERROR("Error registering exit hotkey to WIN+ALT+VK_PAUSE.\n"
-                      "Is an instance of AutoRun already running?");
+        P_FATAL_ERROR("Error registering exit hotkey to WIN+ALT+VK_PAUSE.");
     }
 
     // initialize the tray icon

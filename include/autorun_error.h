@@ -7,6 +7,6 @@
 #define AUTORUN_AUTORUN_ERROR_H
 
 #define P_FATAL_ERROR(x) MessageBoxA(NULL, x, "Error", MB_OK | MB_ICONERROR); \
-                         exit(-1)
+                         ExitProcess(-1)
 
 #endif //AUTORUN_AUTORUN_ERROR_H

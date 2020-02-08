@@ -25,6 +25,7 @@ uint8_t* prepare_vkarray(int* arraySize) {
     monitorBuffer.push_back(VK_CONTROL); // ctrl
     monitorBuffer.push_back(VK_MENU);    // alt
     monitorBuffer.push_back(VK_TAB);     // tab
+    monitorBuffer.push_back(VK_SPACE);   // space
 
     range(monitorBuffer, 0x30, 0x39); // 0-9
     range(monitorBuffer, 0x41, 0x5A); // A-Z

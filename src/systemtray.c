@@ -7,28 +7,56 @@
 #include "resource.h"
 
 #define TRAY_CALLBACK_MSG 101
-#define TRAY_ID 100
+#define TRAY_ID 69
 #define ic_strcpy(dest, src) memcpy(dest, src, strlen(src) + 1)
 
 const char szClassName[] = "GenericTrayCallback";
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-    if (msg == TRAY_CALLBACK_MSG) {
-        switch (lParam) {
-            case WM_LBUTTONUP:
-                MessageBoxA(hwnd, "You can exit AutoRun by simply right-clicking the tray icon\n"
-                                  "or with the hotkey WIN+ALT+PAUSE.", "AutoRun", MB_OK | MB_ICONINFORMATION);
-                break;
-            case WM_RBUTTONUP:
-                ExitProcess(0);
-            default:
-                break; // sanity check
-        }
+    switch (msg) {
+        case TRAY_CALLBACK_MSG:
+            switch (lParam) {
+                case WM_LBUTTONUP:
+                case WM_RBUTTONUP:
+                    HMENU hMenu, hMenuContainer;
+                    hMenuContainer = LoadMenuA(GetModuleHandle(NULL), MAKEINTRESOURCE(IDR_TRAY_MENU));
+                    hMenu = GetSubMenu(hMenuContainer, 0);
+                    // I ended up deciding to use resources
+//                hMenu = CreatePopupMenu();
+//                AppendMenuA(hMenu, MF_STRING, MENU_ID_TEST1, "Test1");
+//                AppendMenuA(hMenu, MF_SEPARATOR, 0, NULL);
+//                AppendMenuA(hMenu, MF_STRING, MENU_ID_EXIT, "Exit");
 
-        return 0;
+                    POINT cursorLoc;
+                    GetCursorPos(&cursorLoc);
+
+                    SetForegroundWindow(hwnd); // needed to make the menu automatically close when it looses focus
+                    TrackPopupMenu(hMenu, TPM_BOTTOMALIGN | TPM_RIGHTALIGN, cursorLoc.x, cursorLoc.y, 0, hwnd, NULL);
+                    SendMessage(hwnd, WM_NULL, 0, 0);
+                    DestroyMenu(hMenu);
+                    DestroyMenu(hMenuContainer);
+                    break;
+                default:
+                    break;
+            }
+            break;
+        case WM_COMMAND:
+            switch (LOWORD(wParam)) {
+                case ID_TRAY_MENU_INFO:
+                    MessageBoxA(NULL, "Created by Andrew Howard, <divisionind.com>. View the github "
+                                      "at https://github.com/divisionind/AutoRun for more info.", "AutoRun", MB_OK | MB_ICONINFORMATION);
+                    break;
+                case ID_TRAY_MENU_EXIT:
+                    ExitProcess(0);
+                default:
+                    break;
+            }
+            break;
+        default:
+            return DefWindowProc(hwnd, msg, wParam, lParam);
     }
 
-    return DefWindowProc(hwnd, msg, wParam, lParam);
+    return 0;
 }
 
 tray_error_t tray_register(HINSTANCE hInst, tray_t* tray) {
@@ -53,7 +81,7 @@ tray_error_t tray_register(HINSTANCE hInst, tray_t* tray) {
     iconData->uFlags = NIF_ICON | NIF_TIP | NIF_MESSAGE; // NIF_ICON means the hIcon is valid, NIF_TIP means the tip string is valid, NIF_MESSAGE means that we are receiving messages through uCallbackMessage
     iconData->hIcon = LoadIconA(hInst, MAKEINTRESOURCE(IDI_MYICON));
     iconData->uCallbackMessage = TRAY_CALLBACK_MSG;
-    ic_strcpy(iconData->szTip, "AutoRun Service | right-click to exit");
+    ic_strcpy(iconData->szTip, "AutoRun Service");
 
     // actually add the icon to the system tray
     if (!Shell_NotifyIconA(NIM_ADD, iconData)) {
