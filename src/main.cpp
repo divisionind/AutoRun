@@ -229,7 +229,7 @@ extern "C" void safe_exit(int code) {
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     // the handle should equal NULL here if creating the mutex failed. however, it doesnt so I just check for the error code
-    CreateMutexA(0, FALSE, "Global\\AutoRunMutex"); // or could be Local if I wanted multiple users to be running this at a time
+    CreateMutexA(0, FALSE, "Global\\AutoRunService"); // or could be Local if I wanted multiple users to be running this at a time
     if (GetLastError() == ERROR_ALREADY_EXISTS) {
         P_FATAL_ERROR("The AutoRun application is already running. See the system "
                       "tray entry for more options.");
