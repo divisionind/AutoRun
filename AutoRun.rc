@@ -1,5 +1,8 @@
 #include "resource.h"
 
+#define AUTORUN_VERSION_WIN AUTORUN_V1,AUTORUN_V2,AUTORUN_V3,0
+#define AUTORUN_VERSION_WIN_ST AUTORUN_VERSION_ST ".0"
+
 IDI_MYICON ICON "autorun-logo.ico"
 
 IDR_TRAY_MENU MENU
@@ -13,8 +16,8 @@ BEGIN
 END
 
 1 VERSIONINFO
- FILEVERSION 1,0,0,1
- PRODUCTVERSION 1,0,0,1
+ FILEVERSION AUTORUN_VERSION_WIN
+ PRODUCTVERSION AUTORUN_VERSION_WIN
  FILEFLAGSMASK 0x3fL
 #ifdef AUTORUN_DEBUG
  FILEFLAGS 0x1L
@@ -31,12 +34,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Division Industries LLC"
             VALUE "FileDescription", "AutoRun Service"
-            VALUE "FileVersion", "1.0.0.1"
+            VALUE "FileVersion", AUTORUN_VERSION_WIN_ST
             VALUE "InternalName", "AutoRun.exe"
-            VALUE "LegalCopyright", "Copyright (C) 2020"
+            VALUE "LegalCopyright", "Copyright (C) " AUTORUN_V1
             VALUE "OriginalFilename", "AutoRun.exe"
             VALUE "ProductName", "AutoRun"
-            VALUE "ProductVersion", "1.0.0.1"
+            VALUE "ProductVersion", AUTORUN_VERSION_WIN_ST
         END
     END
     BLOCK "VarFileInfo"
