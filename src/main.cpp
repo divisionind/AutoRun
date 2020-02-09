@@ -148,7 +148,7 @@ LRESULT CALLBACK LowLevelKeyboardProc(int code, WPARAM wparam, LPARAM lparam) {
                         // ignore key ups
                         if (enabled) {
                             // if key repeating is enabled and a key is released, return 1 or -1 and do not call CallNextHookEx() e.g. consume the event
-                            return -1;
+                            return -1; // maybe dont consume the event? it could lead to problems with unsupported keyboard keys (or just support all keys)
                         } else KEY_STATES[hook->vkCode] = 0;
                         break;
                     case WM_KEYDOWN:
