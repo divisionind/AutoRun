@@ -9,12 +9,31 @@ pressed until you press a key on the keyboard again.
 TODO
 
 ### Building
-TODO
+#### Dependencies
+* Visual Studios C/C++ (recommended 2015 or above)
+* CMake 3.1 or newer
+* Git
 
-### Other notes / Known issues
-This program is currently in the early stages of development and will likely change a lot
-as time passes.
+#### Build process
+1. Clone the source
+    ```
+    git clone https://github.com/divisionind/AutoRun.git
+    cd AutoRun
+    ```
+2. Generate the build files with CMake
+    * Release: `cmake . -DRELEASE_BUILD=1`
+    * Debug: `cmake . -DRELEASE_BUILD=0` or `cmake .`
+    * _NOTE: You can specify the `-G` option to cmake to choose a specific compiler. See `cmake -h` 
+      for a list of compilers installed on your system._
+3. Open the build files
+    * For visual studios this will be the `AutoRun.sln` file.
+    * Ensure you have Debug or Release selected in the editor as appropriate then go to the menu
+      bar and select `Build->Rebuild Solution`
+4. The executable will be located in `[Release or Debug]/AutoRun.exe`
+5. If you would like AutoRun to start automatically when you start Windows, create a shortcut to
+   the program and place it in `%appdata%/Microsoft/Windows/Start Menu/Programs/Startup`
 
-*NOTE: My main reason for writing this was to explore low level inputs on Windows so how
+### Other notes
+My main reason for writing this was to explore low level inputs on Windows so how
 I do stuff here is not the best or easiest in all cases but instead its in service of 
-that original idea.*
+that original idea.
