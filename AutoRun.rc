@@ -26,7 +26,7 @@ BEGIN
    CONTROL "AutoRun", 1001, STATIC, SS_LEFT | WS_CHILD | WS_VISIBLE | WS_GROUP, 10, 13, 118, 24
    CONTROL AUTORUN_VERSION_ST, 1002, STATIC, SS_LEFT | WS_CHILD | WS_VISIBLE | WS_GROUP, 11, 36, 91, 20
    //CONTROL IDB_LOGO_BITMAP, 1063, STATIC, SS_BITMAP | WS_CHILD | WS_VISIBLE, 163, 6, 85, 79
-   CONTROL "Copyright \xA9 2020 Division Industries LLC. All Rights Reserved.", 1003, STATIC, SS_LEFT | WS_CHILD | WS_VISIBLE | WS_GROUP, 11, 96, 237, 13
+   CONTROL "Copyright \xA9 2020 Division Industries LLC. GNU General Public License v3.0.", 1003, STATIC, SS_LEFT | WS_CHILD | WS_VISIBLE | WS_GROUP, 11, 96, 237, 13
    CONTROL "https://divisionind.com/", 1004, STATIC, SS_LEFT | WS_CHILD | WS_VISIBLE | WS_GROUP, 11, 110, 237, 10
    CONTROL "https://github.com/divisionind/AutoRun/", 1005, STATIC, SS_LEFT | WS_CHILD | WS_VISIBLE | WS_GROUP, 11, 124, 149, 12
    CONTROL "OK", 1, BUTTON, BS_DEFPUSHBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 202, 124, 50, 14
@@ -53,7 +53,7 @@ BEGIN
             VALUE "FileDescription", "AutoRun Service"
             VALUE "FileVersion", AUTORUN_VERSION_WIN_ST
             VALUE "InternalName", "AutoRun.exe"
-            VALUE "LegalCopyright", "All rights reserved."
+            VALUE "LegalCopyright", "GNU General Public License v3.0"
             VALUE "OriginalFilename", "AutoRun.exe"
             VALUE "ProductName", "AutoRun"
             VALUE "ProductVersion", AUTORUN_VERSION_WIN_ST
