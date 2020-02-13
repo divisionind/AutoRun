@@ -4,7 +4,7 @@ project(AutoRun)
 # version info for building
 set(V1 2020)
 set(V2 1)
-set(V3 2)
+set(V3 3)
 
 set(CMAKE_CXX_STANDARD 14)
 
