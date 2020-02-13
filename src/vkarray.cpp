@@ -34,11 +34,14 @@ uint8_t* prepare_vkarray(int* arraySize) {
     std::vector<uint8_t> monitorBuffer;
 
     // these are first so they are always added first in the input buffer (and apply their modification to the other keys)
-    monitorBuffer.push_back(VK_SHIFT);   // shift
-    monitorBuffer.push_back(VK_CONTROL); // ctrl
-    monitorBuffer.push_back(VK_MENU);    // alt
-    monitorBuffer.push_back(VK_TAB);     // tab
-    monitorBuffer.push_back(VK_SPACE);   // space
+    monitorBuffer.push_back(VK_LSHIFT);   // shift
+    monitorBuffer.push_back(VK_RSHIFT);   // shift
+    monitorBuffer.push_back(VK_LCONTROL); // ctrl
+    monitorBuffer.push_back(VK_RCONTROL); // ctrl
+    monitorBuffer.push_back(VK_LMENU);    // alt
+    monitorBuffer.push_back(VK_RMENU);    // alt
+    monitorBuffer.push_back(VK_TAB);      // tab
+    monitorBuffer.push_back(VK_SPACE);    // space
 
     range(monitorBuffer, 0x30, 0x39); // 0-9
     range(monitorBuffer, 0x41, 0x5A); // A-Z

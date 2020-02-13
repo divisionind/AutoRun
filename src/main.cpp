@@ -174,7 +174,6 @@ LRESULT CALLBACK LowLevelKeyboardProc(int code, WPARAM wparam, LPARAM lparam) {
                         } else {
                             KEY_STATES[hook->vkCode] = 1;
                         }
-                        break;
                 }
             }
         }

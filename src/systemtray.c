@@ -27,7 +27,7 @@ const char szClassName[] = "GenericTrayCallback";
 
 extern void safe_exit(int code);
 
-BOOL CALLBACK DialogProcInfo(HWND hwnd, UINT msg, WPARAM wParam, LPARAM) {
+BOOL CALLBACK DialogProcInfo(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     switch (msg) {
         case WM_COMMAND:
             switch (LOWORD(wParam)) {
