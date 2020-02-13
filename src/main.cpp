@@ -1,6 +1,19 @@
 /*
+ * AutoRun - maintains pressed keys on your keyboard when activated by a hotkey
  * Copyright (C) 2020, Andrew Howard, <divisionind.com>
- * All rights reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include <Windows.h>
@@ -40,7 +53,7 @@ std::atomic_bool enabled;
 // task responsible for holding down the pressed keys
 std::thread* holdTask;
 INPUT* inputsBuffer;
-UINT inputsBufferSize;
+uint32_t inputsBufferSize;
 
 void enable_hold_task() {
     // determine held keys using our own low-level tracking of key states which ignores keys injected by us
@@ -67,7 +80,7 @@ void enable_hold_task() {
     inputsBuffer = new INPUT[inputsBufferSize];
     memset(inputsBuffer, 0, inputsBufferSize * sizeof(INPUT));
     log("Inputs(%i): ", inputsBufferSize);
-    for (int i = 0; i < inputsBufferSize; i++) {
+    for (uint32_t i = 0; i < inputsBufferSize; i++) {
         inputsBuffer[i].type = INPUT_KEYBOARD;
         inputsBuffer[i].ki.wVk = inputCodes[i];
         // resolves a scancode for the input, necessary for most games
@@ -102,7 +115,7 @@ void disable_hold_task() {
         holdTask->join();
 
         // modify key input buffer with keyup flag and send it
-        for (int i = 0; i < inputsBufferSize; i++) {
+        for (uint32_t i = 0; i < inputsBufferSize; i++) {
             inputsBuffer[i].ki.dwFlags |= KEYEVENTF_KEYUP;
         }
         SendInput(inputsBufferSize, inputsBuffer, sizeof(INPUT));
