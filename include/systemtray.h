@@ -25,7 +25,7 @@
 extern "C" {
 #endif
 
-typedef struct {
+typedef struct _tray {
     NOTIFYICONDATAA icon;
     WNDCLASSEXA fakeWindow;
 } tray_t;
