@@ -36,6 +36,8 @@
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #endif
 
+#define AUTORUN_MANUAL_INJECT true
+
 /*
  * SendInput and keybd_event are susceptible to User Interface Privilege Isolation (UIPI). An
  * application running at a higher integrity level than an application calling SendInput will
@@ -101,6 +103,7 @@ void enable_hold_task() {
     }
     log("\n");
 
+#if AUTORUN_MANUAL_INJECT
     // allocate a new thread and run hold task
     holdTask = new std::thread([=] {
         clock_t time;
@@ -117,9 +120,13 @@ void enable_hold_task() {
             } while ((clock() - time) < 32 && enabled);
         } while (enabled);
     });
+#else
+    SendInput(inputsBufferSize, inputsBuffer, sizeof(INPUT));
+#endif
 }
 
 void disable_hold_task() {
+#if AUTORUN_MANUAL_INJECT
     // clean up and merge hold task thread
     if (holdTask != NULL) {
         // join task and wait for it to exit
@@ -140,6 +147,18 @@ void disable_hold_task() {
         memset(KEY_STATES, 0, KEY_STATE_BUFFER_SIZE);
         log("toggled off\n");
     }
+#else
+    // modify key input buffer with keyup flag and send it
+    for (uint32_t i = 0; i < inputsBufferSize; i++) {
+        inputsBuffer[i].ki.dwFlags |= KEYEVENTF_KEYUP;
+    }
+    SendInput(inputsBufferSize, inputsBuffer, sizeof(INPUT));
+    delete[] inputsBuffer;
+
+    // zero memory here because we do not track key events whilst this task is enabled (not entirely necessary as we run this synchronously with llkeyboardproc)
+    memset(KEY_STATES, 0, KEY_STATE_BUFFER_SIZE);
+    log("toggled off\n");
+#endif
 }
 
 /*

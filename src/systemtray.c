@@ -69,11 +69,20 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
                     POINT cursorLoc;
                     GetCursorPos(&cursorLoc);
 
+//                    HBRUSH color = CreateSolidBrush(RGB(255, 0, 0));
+//                    MENUINFO menuInfo;
+//                    memset(&menuInfo, 0, sizeof(MENUINFO));
+//                    menuInfo.cbSize = sizeof(MENUINFO);
+//                    menuInfo.fMask = MIM_BACKGROUND | MIM_APPLYTOSUBMENUS;
+//                    menuInfo.hbrBack = color;
+//                    SetMenuInfo(hMenu, &menuInfo);
+
                     SetForegroundWindow(hwnd); // needed to make the menu automatically close when it looses focus
                     TrackPopupMenu(hMenu, TPM_BOTTOMALIGN | TPM_RIGHTALIGN, cursorLoc.x, cursorLoc.y, 0, hwnd, NULL);
                     SendMessage(hwnd, WM_NULL, 0, 0);
                     DestroyMenu(hMenu);
                     DestroyMenu(hMenuContainer);
+//                    DeleteObject(color);
                     break;
                 default:
                     break;
@@ -136,6 +145,9 @@ tray_error_t tray_remove(tray_t* tray) {
     if (!Shell_NotifyIconA(NIM_DELETE, &tray->icon)) {
         return TRAY_ERR_NOTIFY;
     }
+
+    // free memory associated with the fake wndclass callback
+    UnregisterClassA(szClassName, tray->fakeWindow.hInstance);
 
     return TRAY_OK;
 }
