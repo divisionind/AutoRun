@@ -25,8 +25,6 @@
 
 const char szClassName[] = "GenericTrayCallback";
 
-extern void safe_exit(int code);
-
 BOOL CALLBACK DialogProcInfo(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     switch (msg) {
         case WM_COMMAND:
@@ -96,7 +94,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 //                    DialogBox(NULL, MAKEINTRESOURCE(ID_DIALOG_TEST), NULL, DialogProcInfo);
                     break;
                 case ID_TRAY_MENU_EXIT:
-                    safe_exit(0);
+                    PostQuitMessage(0);
                 default:
                     break;
             }

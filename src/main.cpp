@@ -22,7 +22,6 @@
 #include <vector>
 
 #include "vkarray.h"
-#include "autorun_error.h"
 #include "systemtray.h"
 
 // https://docs.microsoft.com/en-us/cpp/mfc/build-requirements-for-windows-vista-common-controls?redirectedfrom=MSDN&view=vs-2019
@@ -53,6 +52,8 @@
 #endif
 
 #define KEY_STATE_BUFFER_SIZE 256
+
+#define P_FATAL_ERROR(x) do { MessageBoxA(NULL, x, "Error", MB_OK | MB_ICONERROR); ExitProcess(1); } while(0)
 
 tray_t tray;
 HHOOK keyboardHook;
@@ -217,20 +218,6 @@ int main() {
     return WinMain(GetModuleHandle(NULL), NULL, NULL, NULL);
 }
 
-/**
- * Exits the application immediately disposing resources
- */
-extern "C" void safe_exit(int code) {
-    UnhookWindowsHookEx(keyboardHook);
-    if (enabled) {
-        enabled = false;
-        disable_hold_task();
-    }
-    delete[] vkarray;
-    tray_remove(&tray);
-    ExitProcess(code);
-}
-
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     // the handle should equal NULL here if creating the mutex failed. however, it doesnt so I just check for the error code
     // TODO maybe try OpenMutexA instead and check if != null per success
@@ -267,7 +254,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 
     MSG msg = {0};
     while (GetMessage(&msg, NULL, 0, 0) != 0) {
-        if (msg.message == WM_HOTKEY) { // TODO check for manual WM_QUIT msg and safe exit on that
+        if (msg.message == WM_HOTKEY) {
             // if hotkey, must have been exit hotkey so exit
             break;
         } else {
@@ -277,6 +264,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
         }
     }
 
-    safe_exit(0);
-    return 0;
+    // safely exit the app
+    UnhookWindowsHookEx(keyboardHook);
+    if (enabled) {
+        enabled = false;
+        disable_hold_task();
+    }
+    delete[] vkarray;
+    tray_remove(&tray);
+    ExitProcess(0);
 }
