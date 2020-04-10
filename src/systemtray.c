@@ -25,65 +25,26 @@
 
 const char szClassName[] = "GenericTrayCallback";
 
-BOOL CALLBACK DialogProcInfo(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-    switch (msg) {
-        case WM_COMMAND:
-            switch (LOWORD(wParam)) {
-                case 1:
-                    EndDialog(hwnd, wParam);
-                    return TRUE;
-            }
-            break;
-        case WM_INITDIALOG:
-            RECT desktop;
-            GetWindowRect(GetDesktopWindow(), &desktop);
-            int horiz = desktop.right;
-            int vert = desktop.bottom;
-
-            RECT dialog;
-            GetWindowRect(hwnd, &dialog);
-            SetWindowPos(hwnd, NULL, (horiz/2) - (dialog.right/2), (vert/2) - (dialog.bottom/2), 0, 0, SWP_NOSIZE | SWP_NOZORDER);
-        default: ;
-    }
-
-    return FALSE;
-}
-
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     switch (msg) {
         case TRAY_CALLBACK_MSG:
             switch (lParam) {
+                default:
+                    break;
                 case WM_LBUTTONUP:
                 case WM_RBUTTONUP:
                     HMENU hMenu, hMenuContainer;
                     hMenuContainer = LoadMenuA(GetModuleHandle(NULL), MAKEINTRESOURCE(IDR_TRAY_MENU));
                     hMenu = GetSubMenu(hMenuContainer, 0);
-                    // I ended up deciding to use resources
-//                hMenu = CreatePopupMenu();
-//                AppendMenuA(hMenu, MF_STRING, MENU_ID_TEST1, "Test1");
-//                AppendMenuA(hMenu, MF_SEPARATOR, 0, NULL);
-//                AppendMenuA(hMenu, MF_STRING, MENU_ID_EXIT, "Exit");
 
                     POINT cursorLoc;
                     GetCursorPos(&cursorLoc);
-
-//                    HBRUSH color = CreateSolidBrush(RGB(255, 0, 0));
-//                    MENUINFO menuInfo;
-//                    memset(&menuInfo, 0, sizeof(MENUINFO));
-//                    menuInfo.cbSize = sizeof(MENUINFO);
-//                    menuInfo.fMask = MIM_BACKGROUND | MIM_APPLYTOSUBMENUS;
-//                    menuInfo.hbrBack = color;
-//                    SetMenuInfo(hMenu, &menuInfo);
 
                     SetForegroundWindow(hwnd); // needed to make the menu automatically close when it looses focus
                     TrackPopupMenu(hMenu, TPM_BOTTOMALIGN | TPM_RIGHTALIGN, cursorLoc.x, cursorLoc.y, 0, hwnd, NULL);
                     SendMessage(hwnd, WM_NULL, 0, 0);
                     DestroyMenu(hMenu);
                     DestroyMenu(hMenuContainer);
-//                    DeleteObject(color);
-                    break;
-                default:
-                    break;
             }
             break;
         case WM_COMMAND:
@@ -91,7 +52,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
                 case ID_TRAY_MENU_ABOUT:
                     MessageBoxA(NULL, "Created by Andrew Howard, <divisionind.com>. View the github "
                                       "at https://github.com/divisionind/AutoRun for more info.", "AutoRun v" AUTORUN_VERSION_ST, MB_OK | MB_ICONINFORMATION);
-//                    DialogBox(NULL, MAKEINTRESOURCE(ID_DIALOG_TEST), NULL, DialogProcInfo);
                     break;
                 case ID_TRAY_MENU_EXIT:
                     PostQuitMessage(0);

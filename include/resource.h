@@ -20,12 +20,9 @@
 #define AUTORUN_RESOURCE_H
 
 #define IDI_MYICON         101
-//#define IDB_LOGO_BITMAP    110
 
 #define IDR_TRAY_MENU      200
 #define ID_TRAY_MENU_EXIT  201
 #define ID_TRAY_MENU_ABOUT 202
-
-#define ID_DIALOG_TEST     300
 
 #endif //AUTORUN_RESOURCE_H
