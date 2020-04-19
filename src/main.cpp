@@ -55,50 +55,50 @@
 
 #define P_FATAL_ERROR(x) do { MessageBoxA(NULL, x, "Error", MB_OK | MB_ICONERROR); ExitProcess(1); } while(0)
 
-tray_t tray;
-HHOOK keyboardHook;
-uint8_t KEY_STATES[KEY_STATE_BUFFER_SIZE];
-uint8_t* vkarray;
-int vkarray_size;
+tray_t   g_tray;
+HHOOK    g_keyboard_hook;
+uint8_t  g_keystates[KEY_STATE_BUFFER_SIZE];
+uint8_t* g_vkarray;
+int      g_vkarray_size;
 
 // whether or not the program is holding down the keys
-std::atomic_bool enabled;
+std::atomic_bool g_enabled;
 
 // task responsible for holding down the pressed keys
-std::thread* holdTask;
-INPUT* inputsBuffer;
-uint32_t inputsBufferSize;
+std::thread* g_hold_task;
+INPUT*       g_inputs_buffer;
+uint32_t     g_inputs_buffer_size;
 
 void enable_hold_task() {
     // determine held keys using our own low-level tracking of key states which ignores keys injected by us
     std::vector<uint8_t> inputCodes;
-    for (int i = 0; i < vkarray_size; i++) {
-        uint8_t keyCode = vkarray[i];
+    for (int i = 0; i < g_vkarray_size; i++) {
+        uint8_t keyCode = g_vkarray[i];
 
         // possible race condition here, however, the effect would be negligible because of how we are quantifying "enabled"/"disabled" so we ignore it for now
         // if 1, key down otherwise, up
-        if (KEY_STATES[keyCode] == 1) {
+        if (g_keystates[keyCode] == 1) {
             // key down, send input
             inputCodes.push_back(keyCode);
         }
     }
 
     // prepare a windows input array using the determined pressed keys
-    inputsBufferSize = inputCodes.size();
+    g_inputs_buffer_size = inputCodes.size();
 
     // ensure there are keys pressed, if not, disable
-    if (inputsBufferSize == 0) {
-        enabled = false;
+    if (g_inputs_buffer_size == 0) {
+        g_enabled = false;
         return;
     }
-    inputsBuffer = new INPUT[inputsBufferSize];
-    memset(inputsBuffer, 0, inputsBufferSize * sizeof(INPUT));
-    log("Inputs(%i): ", inputsBufferSize);
-    for (uint32_t i = 0; i < inputsBufferSize; i++) {
-        inputsBuffer[i].type = INPUT_KEYBOARD;
-        inputsBuffer[i].ki.wVk = inputCodes[i];
+    g_inputs_buffer = new INPUT[g_inputs_buffer_size];
+    memset(g_inputs_buffer, 0, g_inputs_buffer_size * sizeof(INPUT));
+    log("Inputs(%i): ", g_inputs_buffer_size);
+    for (uint32_t i = 0; i < g_inputs_buffer_size; i++) {
+        g_inputs_buffer[i].type = INPUT_KEYBOARD;
+        g_inputs_buffer[i].ki.wVk = inputCodes[i];
         // resolves a scancode for the input, necessary for most games
-        inputsBuffer[i].ki.wScan = MapVirtualKeyA(inputCodes[i], MAPVK_VK_TO_VSC);
+        g_inputs_buffer[i].ki.wScan = MapVirtualKeyA(inputCodes[i], MAPVK_VK_TO_VSC);
 
         log("0x%02X ", inputCodes[i]);
     }
@@ -106,11 +106,11 @@ void enable_hold_task() {
 
 #if AUTORUN_MANUAL_INJECT
     // allocate a new thread and run hold task
-    holdTask = new std::thread([=] {
+    g_hold_task = new std::thread([=] {
         clock_t time;
         do {
             // repeatedly send inputs
-            SendInput(inputsBufferSize, inputsBuffer, sizeof(INPUT));
+            SendInput(g_inputs_buffer_size, g_inputs_buffer, sizeof(INPUT));
 
             // note: ensure def CLOCKS_PER_SEC == 1000
             //Sleep(33); // replaced with the following loop to reduce maximum delay from joining task in disable_hold_task() to ~1-2ms
@@ -118,8 +118,8 @@ void enable_hold_task() {
             do {
                 // or std::this_thread::yield(), i like sleep because it allows the kernel more time for context switching
                 Sleep(1);
-            } while ((clock() - time) < 32 && enabled);
-        } while (enabled);
+            } while ((clock() - time) < 32 && g_enabled);
+        } while (g_enabled);
     });
 #else
     SendInput(inputsBufferSize, inputsBuffer, sizeof(INPUT));
@@ -129,23 +129,23 @@ void enable_hold_task() {
 void disable_hold_task() {
 #if AUTORUN_MANUAL_INJECT
     // clean up and merge hold task thread
-    if (holdTask != NULL) {
+    if (g_hold_task != NULL) {
         // join task and wait for it to exit
-        holdTask->join();
+        g_hold_task->join();
 
         // modify key input buffer with keyup flag and send it
-        for (uint32_t i = 0; i < inputsBufferSize; i++) {
-            inputsBuffer[i].ki.dwFlags |= KEYEVENTF_KEYUP;
+        for (uint32_t i = 0; i < g_inputs_buffer_size; i++) {
+            g_inputs_buffer[i].ki.dwFlags |= KEYEVENTF_KEYUP;
         }
-        SendInput(inputsBufferSize, inputsBuffer, sizeof(INPUT));
+        SendInput(g_inputs_buffer_size, g_inputs_buffer, sizeof(INPUT));
 
         // free stuff
-        delete holdTask;
-        delete[] inputsBuffer;
-        holdTask = NULL;
+        delete g_hold_task;
+        delete[] g_inputs_buffer;
+        g_hold_task = NULL;
 
         // zero memory here because we do not track key events whilst this task is enabled (not entirely necessary as we run this synchronously with llkeyboardproc)
-        memset(KEY_STATES, 0, KEY_STATE_BUFFER_SIZE);
+        memset(g_keystates, 0, KEY_STATE_BUFFER_SIZE);
         log("toggled off\n");
     }
 #else
@@ -182,28 +182,28 @@ LRESULT CALLBACK LowLevelKeyboardProc(int code, WPARAM wparam, LPARAM lparam) {
             // toggle if toggle key
             if (hook->vkCode == VK_PAUSE) {
                 if (wparam == WM_KEYDOWN) {
-                    enabled = !enabled;
-                    if (enabled) enable_hold_task(); else disable_hold_task();
+                    g_enabled = !g_enabled;
+                    if (g_enabled) enable_hold_task(); else disable_hold_task();
                 }
             } else {
                 switch (wparam) {
                     case WM_KEYUP:
                     case WM_SYSKEYUP:
                         // ignore key ups
-                        if (enabled) {
+                        if (g_enabled) {
                             // if key repeating is enabled and a key is released, return 1 or -1 and do not call CallNextHookEx() e.g. consume the event
                             return -1; // maybe dont consume the event? it could lead to problems with unsupported keyboard keys (or just support all keys)
-                        } else KEY_STATES[hook->vkCode] = 0;
+                        } else g_keystates[hook->vkCode] = 0;
                         break;
                     case WM_KEYDOWN:
                     case WM_SYSKEYDOWN:
                     default:
                         // otherwise if is key down event (fresh key press), disable status
-                        if (enabled) {
-                            enabled = false;
+                        if (g_enabled) {
+                            g_enabled = false;
                             disable_hold_task();
                         } else {
-                            KEY_STATES[hook->vkCode] = 1;
+                            g_keystates[hook->vkCode] = 1;
                         }
                 }
             }
@@ -232,7 +232,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     }
 
     // initialize the tray icon
-    switch (tray_register(hInstance, &tray)) {
+    switch (tray_register(hInstance, &g_tray)) {
         case TRAY_OK:
             break;
         case TRAY_ERR_CLASS:
@@ -242,12 +242,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     }
 
     // initialize autorun info
-    memset(KEY_STATES, 0, KEY_STATE_BUFFER_SIZE);
-    enabled = false;
-    vkarray = prepare_vkarray(&vkarray_size);
+    memset(g_keystates, 0, KEY_STATE_BUFFER_SIZE);
+    g_enabled = false;
+    g_vkarray = prepare_vkarray(&g_vkarray_size);
 
-    keyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, NULL, 0);
-    if (keyboardHook == NULL) {
+    g_keyboard_hook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, NULL, 0);
+    if (g_keyboard_hook == NULL) {
         P_FATAL_ERROR("Failed to set windows low level keyboard hook.");
     }
 
@@ -264,12 +264,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     }
 
     // safely exit the app
-    UnhookWindowsHookEx(keyboardHook);
-    if (enabled) {
-        enabled = false;
+    UnhookWindowsHookEx(g_keyboard_hook);
+    if (g_enabled) {
+        g_enabled = false;
         disable_hold_task();
     }
-    delete[] vkarray;
-    tray_remove(&tray);
+    delete[] g_vkarray;
+    tray_remove(&g_tray);
     ExitProcess(0);
 }
