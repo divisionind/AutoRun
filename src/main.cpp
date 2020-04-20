@@ -24,6 +24,13 @@
 #include "vkarray.h"
 #include "systemtray.h"
 
+/*
+ * SendInput and keybd_event are susceptible to User Interface Privilege Isolation (UIPI). An
+ * application running at a higher integrity level than an application calling SendInput will
+ * not receive this input.
+ * Maybe run AutoRun with administrator permissions if it doesn't work with some apps?
+ */
+
 // https://docs.microsoft.com/en-us/cpp/mfc/build-requirements-for-windows-vista-common-controls?redirectedfrom=MSDN&view=vs-2019
 #if defined _M_IX86
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='x86' publicKeyToken='6595b64144ccf1df' language='*'\"")
@@ -35,15 +42,6 @@
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #endif
 
-#define AUTORUN_MANUAL_INJECT true
-
-/*
- * SendInput and keybd_event are susceptible to User Interface Privilege Isolation (UIPI). An
- * application running at a higher integrity level than an application calling SendInput will
- * not receive this input.
- * Maybe run AutoRun with administrator permissions if it doesn't work with some apps?
- */
-
 #ifdef AUTORUN_DEBUG
 // can use these as well: __FILE__, __LINE__ and __func__
 #define log(x, ...) printf(x, __VA_ARGS__)
@@ -51,6 +49,7 @@
 #define log(x, ...)
 #endif
 
+#define AUTORUN_MANUAL_INJECT true
 #define KEY_STATE_BUFFER_SIZE 256
 
 #define P_FATAL_ERROR(x) do { MessageBoxA(NULL, x, "Error", MB_OK | MB_ICONERROR); ExitProcess(1); } while(0)
@@ -164,14 +163,7 @@ void disable_hold_task() {
 
 /*
  * Note: Everything processed here needs to be very quick.
- * Also note: THE STACK SIZE IS VERY SMALL
- * See this for more details: https://docs.microsoft.com/en-us/previous-versions/windows/desktop/legacy/ms644985(v%3Dvs.85)
- *
- * It may be wise to queue events and process them on another thread
- * if it is chosen to do more here in the future. Use a thread-safe queue
- * like this: https://github.com/cameron314/concurrentqueue
- * or
- * You could use a blocking queue using STL like what is demonstrated in AtomicQueue
+ * It may be wise to queue events and process them on another thread.
  */
 LRESULT CALLBACK LowLevelKeyboardProc(int code, WPARAM wparam, LPARAM lparam) {
     if (code == HC_ACTION) {

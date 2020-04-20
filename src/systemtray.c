@@ -50,7 +50,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         case WM_COMMAND:
             switch (LOWORD(wParam)) {
                 case ID_TRAY_MENU_ABOUT:
-                    MessageBoxA(NULL, "Created by Andrew Howard, <divisionind.com>. View the github "
+                    MessageBoxA(NULL, "Created by Andrew Howard <divisionind.com>. View the source "
                                       "at https://github.com/divisionind/AutoRun for more info.", "AutoRun v" AUTORUN_VERSION_ST, MB_OK | MB_ICONINFORMATION);
                     break;
                 case ID_TRAY_MENU_EXIT:
