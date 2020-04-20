@@ -26,6 +26,6 @@
  * @param arraySize
  * @return
  */
-uint8_t* prepare_vkarray(int* arraySize);
+uint8_t* vkarray_prepare(int* arraySize);
 
 #endif //AUTORUN_VKARRAY_H

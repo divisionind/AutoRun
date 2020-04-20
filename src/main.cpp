@@ -236,7 +236,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     // initialize autorun info
     memset(g_keystates, 0, KEY_STATE_BUFFER_SIZE);
     g_enabled = false;
-    g_vkarray = prepare_vkarray(&g_vkarray_size);
+    g_vkarray = vkarray_prepare(&g_vkarray_size);
 
     g_keyboard_hook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, NULL, 0);
     if (g_keyboard_hook == NULL) {

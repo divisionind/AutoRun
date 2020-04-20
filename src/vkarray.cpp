@@ -30,7 +30,7 @@ void range(std::vector<uint8_t>& vector, int start, int end) {
 }
 
 // https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
-uint8_t* prepare_vkarray(int* arraySize) {
+uint8_t* vkarray_prepare(int* arraySize) {
     std::vector<uint8_t> buff;
 
     // these are first so they are always added first in the input buffer (and apply their modification to the other keys)
