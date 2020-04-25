@@ -174,8 +174,14 @@ LRESULT CALLBACK LowLevelKeyboardProc(int code, WPARAM wparam, LPARAM lparam) {
             // toggle if toggle key
             if (hook->vkCode == VK_PAUSE) {
                 if (wparam == WM_KEYDOWN) {
-                    g_enabled = !g_enabled;
-                    if (g_enabled) enable_hold_task(); else disable_hold_task();
+                    // effectively ignores pause/break when holding is enabled
+                    if (!g_enabled) {
+                        g_enabled = true;
+                        enable_hold_task();
+                    } else {
+                        // keyboard holding already enabled, time for mouse holding
+                        // TODO implement mouse support
+                    }
                 }
             } else {
                 switch (wparam) {
