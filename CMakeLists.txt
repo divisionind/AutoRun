@@ -11,7 +11,7 @@ set(CMAKE_CXX_STANDARD 14)
 # allows us to use direct paths in includes (e.g. "systemtray.h" instead of "../include/systemtray.h")
 include_directories(src include)
 
-set(SRC_LIST src/main.cpp include/vkarray.h src/vkarray.cpp include/resource.h AutoRun.rc src/systemtray.c include/systemtray.h)
+set(SRC_LIST src/main.cpp src/vkarray.h src/vkarray.cpp src/resource.h AutoRun.rc src/systemtray.c src/systemtray.h)
 add_definitions(-DAUTORUN_V1=${V1})
 add_definitions(-DAUTORUN_V2=${V2})
 add_definitions(-DAUTORUN_V3=${V3})
