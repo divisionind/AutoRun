@@ -39,3 +39,8 @@ and holds them down. Keys are then released when **any** key is pressed on the k
 My main reason for writing this was to explore low level inputs on Windows so how
 I do stuff here is not the best or easiest in all cases but instead its in service of 
 that original idea.
+
+### Donate
+- BTC: `bc1qhr43elqs4hduv6ls0893zup7t6mlmlh8qmcl30`
+- ETH: `0x1bdA7dB6484802DFf4945edc52363B4A8FAcb470`
+- ETC: `0x4a368bb4cd854f650169ce207268c303ffecafb2`
