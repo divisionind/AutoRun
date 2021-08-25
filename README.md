@@ -6,7 +6,7 @@ press the PAUSE key. You can now take your hand off the keyboard, and the keys w
 pressed until you press a key on the keyboard again.
 
 ### How it works
-AutoRun monitors the status of the keyboard using a [low level keyboard hook](https://docs.microsoft.com/en-us/previous-versions/windows/desktop/legacy/ms644985(v%3Dvs.85). 
+AutoRun monitors the status of the keyboard using a [low level keyboard hook](https://docs.microsoft.com/en-us/windows/win32/winmsg/lowlevelkeyboardproc). 
 When the hotkey PAUSE/BREAK is pressed, it takes all currently held keys (listed in src/vkarray.cpp) 
 and holds them down. Keys are then released when **any** key is pressed on the keyboard.
 
