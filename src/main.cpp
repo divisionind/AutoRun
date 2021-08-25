@@ -216,6 +216,9 @@ int main() {
     return WinMain(GetModuleHandle(NULL), NULL, NULL, NULL);
 }
 
+// TODO check if started with toggleStartm arg, verify admin perm., check whether or not the short cut to the prgm is in the start menu or not, perform inverse
+// use same check function for the ui in tray menu, use CreateProcess with admin permission request flag
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     // the handle should equal NULL here if creating the mutex failed. however, it doesnt so I just check for the error code
     CreateMutexA(0, FALSE, "Global\\AutoRunService"); // or could be Local if I wanted multiple users to be running this at a time
